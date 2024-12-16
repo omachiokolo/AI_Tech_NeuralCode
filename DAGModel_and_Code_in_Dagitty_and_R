@@ -1,0 +1,214 @@
+Dagitty Model
+Assumptions
+The model implies the following conditional independences: 
+Survival_rate ⊥ Diseases | Confounders, Treatment
+exposure(s)	Disease
+outcome(s)	Survival_rate
+covariates	2
+causal paths	2
+
+
+dag {
+Confounders [adjusted,pos="-0.400,-0.311"]
+Diseases [exposure,pos="-1.915,1.599"]
+Survival_rate [outcome,pos="0.919,1.634"]
+Treatment [pos="-0.419,1.593"]
+Confounders -> Diseases
+Confounders -> Survival_rate
+Confounders -> Treatment
+Diseases -> Treatment
+Treatment -> Survival_rate
+}
+
+
+Confounding for Gender
+The model implies the following conditional independences: 
+Survival_rate ⊥ Diseases | Gender, Treatment
+
+dag {
+Diseases [exposure,pos="-2.200,1.597"]
+Gender [pos="-0.493,-0.280"]
+Survival_rate [outcome,pos="1.400,1.621"]
+Treatment [pos="-0.459,1.563"]
+Diseases -> Gender
+Diseases -> Treatment
+Gender -> Survival_rate
+Gender -> Treatment
+Treatment -> Survival_rate
+}
+
+Confounding for Age_Group
+
+Survival_rate ⊥ Diseases | Age_group, Treatment
+
+dag {
+Age_group [pos="-0.493,-0.280"]
+Diseases [exposure,pos="-2.200,1.597"]
+Survival_rate [outcome,pos="1.400,1.621"]
+Treatment [pos="-0.459,1.563"]
+Age_group -> Survival_rate
+Age_group -> Treatment
+Diseases -> Age_group
+Diseases -> Treatment
+Treatment -> Survival_rate
+}
+
+Confounding for Severity_of_Illness
+
+The model implies the following conditional independences: 
+•	Survival_rate ⊥ Diseases | Severity_of_Illness, Treatment
+
+dag {
+Diseases [exposure,pos="-2.200,1.597"]
+Severity_of_Illness [pos="-0.493,-0.280"]
+Survival_rate [outcome,pos="1.400,1.621"]
+Treatment [pos="-0.459,1.563"]
+Diseases -> Severity_of_Illness
+Diseases -> Treatment
+Severity_of_Illness -> Survival_rate
+Severity_of_Illness -> Treatment
+Treatment -> Survival_rate
+}
+
+Confounding for Risk_of_Mortality
+
+The model implies the following conditional independences: 
+•	Survival_rate ⊥ Diseases | Risk_of_Mortality, Treatment
+
+dag {
+Diseases [exposure,pos="-2.200,1.597"]
+Risk_of_Mortality [pos="-0.493,-0.280"]
+Survival_rate [outcome,pos="1.400,1.621"]
+Treatment [pos="-0.459,1.563"]
+Diseases -> Risk_of_Mortality
+Diseases -> Treatment
+Risk_of_Mortality -> Survival_rate
+Risk_of_Mortality -> Treatment
+Treatment -> Survival_rate
+}
+
+
+Code for R and Dagitty
+
+> data<-read.csv(file="C:/Users/omachi.okolo/Desktop/PhD_Work/newdataset_D.csv", header = TRUE)
+> attach(data)
+> library(dagitty)
+> data <- na.omit(data) 
+> # Design a SCM DAG for dataset from Dagitty package and coping coordinates into R
+> myDAG1<-dagitty('dag {
++     Confounders [pos="-0.493,-0.280"]
++     Diseases [exposure,pos="-2.200,1.597"]
++     Survival_rate [outcome,pos="1.400,1.621"]
++     Treatment [pos="-0.459,1.563"]
++     Confounders -> Survival_rate
++     Confounders -> Treatment
++     Diseases -> Confounders
++     Diseases -> Treatment
++     Treatment -> Survival_rate
++ }')
+> 
+> # Vieing the SCM struture
+> plot(myDAG1)
+> Developing a SCM DAG for X=gender
+> #Developing a SCM for Gender
+> myDAG_G<-dagitty('dag {
++     Diseases [exposure,pos="-2.200,1.597"]
++     Gender [pos="-0.493,-0.280"]
++     Survival_rate [outcome,pos="1.400,1.621"]
++     Treatment [pos="-0.459,1.563"]
++     Diseases -> Gender
++     Diseases -> Treatment
++     Gender -> Survival_rate
++     Gender -> Treatment
++     Treatment -> Survival_rate
++ }')
+> 
+> # Vieing the SCM DAG struture for gender
+> plot(myDAG_G)
+> # CIT results and graph plot for Gender
+> CIT <- localTests(myDAG_G, data=data, type="cis")
+> # Results display of CIT for Gender
+> print(CIT)
+                                estimate   p.value        2.5%      97.5%
+Dsss _||_ Srv_ | Gndr, Trtm -0.005141721 0.5289365 -0.02114432 0.01086351
+> # Graphic display for Gender
+> plotLocalTestResults(CIT)
+> # Developing a SCM DAG for # Developing Age_Group
+> myDAG_A<-dagitty('dag {
++     Age_Group [pos="-0.493,-0.280"]
++     Diseases [exposure,pos="-2.200,1.597"]
++     Survival_rate [outcome,pos="1.400,1.621"]
++     Treatment [pos="-0.459,1.563"]
++     Age_Group -> Survival_rate
++     Age_Group -> Treatment
++     Diseases -> Age_Group
++     Diseases -> Treatment
++     Treatment -> Survival_rate
++ }')
+> 
+> # Vieing the SCM DAG struture for Age_Group
+> plot(myDAG_A)
+> # CIT results and graph plot for Age_Group
+> CIT_A <- localTests(myDAG_A, data=data, type="cis")
+> print(CIT_A)
+                               estimate      p.value       2.5%       97.5%
+Dsss _||_ Srv_ | Ag_G, Trtm -0.08660599 2.117721e-26 -0.1024691 -0.07069977
+> # Grahic display for Age_Group
+> plotLocalTestResults(CIT_A)
+> # Developing a SCM for severity_of_illness
+> myDAG_S<-dagitty('dag {
++     Diseases [exposure,pos="-2.200,1.597"]
++     Severity_of_Illness [pos="-0.493,-0.280"]
++     Survival_rate [outcome,pos="1.400,1.621"]
++     Treatment [pos="-0.459,1.563"]
++     Diseases -> Severity_of_Illness
++     Diseases -> Treatment
++     Severity_of_Illness -> Survival_rate
++     Severity_of_Illness -> Treatment
++     Treatment -> Survival_rate
++ }')
+> #Vieing the SCM DAG structure for Severity_of_Illness
+> plot(myDAG_S)
+> # CIT results and graph plot for severity_of_illness
+> CIT_S <- localTests(myDAG_S, data=data, type="cis")
+> print(CIT_S)
+                               estimate    p.value        2.5%       97.5%
+Dsss _||_ Srv_ | S__I, Trtm -0.01353112 0.09751101 -0.02952907 0.002473756
+> # Grahic display for severity_of_illness
+> plotLocalTestResults(CIT_S)
+> #Developing a SCM for Risk_of_Mortality
+> myDAG_R<-dagityy('dag {
++     Diseases [exposure,pos="-2.200,1.597"]
++     Risk_of_Mortality [pos="-0.493,-0.280"]
++     Survival_rate [outcome,pos="1.400,1.621"]
++     Treatment [pos="-0.459,1.563"]
++     Diseases -> Risk_of_Mortality
++     Diseases -> Treatment
++     Risk_of_Mortality -> Survival_rate
++     Risk_of_Mortality -> Treatment
++     Treatment -> Survival_rate
++ }')
+> myDAG_R<-dagitty('dag {
++     Diseases [exposure,pos="-2.200,1.597"]
++     Risk_of_Mortality [pos="-0.493,-0.280"]
++     Survival_rate [outcome,pos="1.400,1.621"]
++     Treatment [pos="-0.459,1.563"]
++     Diseases -> Risk_of_Mortality
++     Diseases -> Treatment
++     Risk_of_Mortality -> Survival_rate
++     Risk_of_Mortality -> Treatment
++     Treatment -> Survival_rate
++ }')
+> 
+> #Vieing the SCM DAG structure for Risk_of_Mortality
+> plot(myDAG_R)
+> # CIT results for Risk_of_Mortality
+> plotLocalTestResults(CIT_R)
+Error: object 'CIT_R' not found
+> CIT_R <- localTests(myDAG_R, data=data, type="cis")
+> print(CIT_R)
+                                estimate   p.value        2.5%      97.5%
+Dsss _||_ Srv_ | R__M, Trtm -0.002604563 0.7497719 -0.01860813 0.01340034
+> # Grahic display for Risk_of_Mortality
+> plotLocalTestResults(CIT_R)
+
